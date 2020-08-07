@@ -17,6 +17,10 @@ cat ./restserver-dev-configs/k8s-job-exit-spec-configuration/k8s-job-exit-spec.y
 
 mkdir -p ${BASE_PATH}/tkestack-configuration
 cat ./restserver-dev-configs/tkestack-configuration/tkestack.yaml > ${BASE_PATH}/tkestack-configuration/tkestack.yaml
+
+mkdir -p ~/.kube/
+cat ./restserver-dev-configs/.kube/config > ~/.kube/config
+
 pushd pai/src/rest-server > /dev/null
 
 cat << __EOT__ > .env
