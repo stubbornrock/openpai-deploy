@@ -1,0 +1,58 @@
+# Copyright (c) Microsoft Corporation
+# All rights reserved.
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+# to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+# If corresponding values aren't be set in the machine list, the default value will be filled in.
+
+# kubernetes api server and dashboard host
+kubernetes:
+  api-servers-url: https://192.168.19.33:6443
+  dashboard-url: https://192.168.19.33:9090
+
+# TODO please modify it according to your own hardware
+machine-sku:
+  GENERIC:
+    mem: 1
+    cpu:
+      vcore: 16
+    os: centos7
+
+machine-list:
+  - dashboard: "true"
+    docker-data: "/mnt/docker"
+    etcdid: "etcdid1"
+    hostip: "192.168.19.33"
+    hostname: "k8s01"
+    k8s-role: "master"
+    machine-type: "GENERIC"
+    nodename: "k8s01"
+    pai-master: "true"
+    password: "Chengshuai1!"
+    ssh-port: "22"
+    username: "root"
+    zkid: "1"
+    
+  - docker-data: "/mnt/docker"
+    hostip: "192.168.19.34"
+    hostname: "k8s02"
+    k8s-role: "worker"
+    machine-type: "GENERIC"
+    nodename: "k8s02"
+    pai-worker: "true"
+    password: "Chengshuai1!"
+    ssh-port: "22"
+    username: "root"

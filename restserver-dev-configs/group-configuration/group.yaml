@@ -1,0 +1,16 @@
+groupDataSource: basic
+
+adminGroup:
+  groupname: "admingroup"
+  description: "admin's group"
+  externalName: ""
+  extension: {"acls": {"admin": true, "virtualClusters": []}}
+
+defaultGroup:
+  groupname: "default"
+  description: "group for default vc"
+  externalName: ""
+  extension: {"acls": {"admin": false, "virtualClusters": ["default"]}}
+
+grouplist:
+  []

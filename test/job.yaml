@@ -1,0 +1,35 @@
+protocolVersion: 2
+name: admin_07fa8931
+type: job
+jobRetryCount: 0
+prerequisites:
+  - type: dockerimage
+    uri: '192.168.21.228/tensorflow/tensorflow-py36-cpu:latest'
+    name: docker_image_0
+    auth:
+      username: admin
+      password: <% $secrets.docker_password_0 %>
+      registryuri: 'http://192.168.21.228'
+taskRoles:
+  taskrole:
+    instances: 1
+    completion:
+      minFailedInstances: 1
+      minSucceededInstances: -1
+    taskRetryCount: 0
+    dockerImage: docker_image_0
+    resourcePerInstance:
+      gpu: 1
+      cpu: 4
+      memoryMB: 8000
+    commands:
+      - sleep 1000000000000
+secrets: '******'
+defaults:
+  virtualCluster: vc2
+extras:
+  com.microsoft.pai.runtimeplugin:
+    - plugin: ssh
+      parameters:
+        jobssh: true
+

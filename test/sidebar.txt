@@ -1,0 +1,1 @@
+src/webportal/src/app/layout/components/sidebar.jsx
