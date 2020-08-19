@@ -6,10 +6,10 @@ namespace: gongdan
 image: tkeregistry.teleaip.cn/library/mltooling/ml-workspace-gpu:ctbri
 storage: ctpai-nfs-storage
 hosts: 192.168.19.119,192.168.19.115
-total_gpu: 5
-total_gpu_memory: 16
-default_gpu: 0.2
-default_gpu_memory: 1
-default_cpu: 2
-default_memory: 2
+total_gpu: 15
+total_gpu_memory: 1023
+default_gpu: 0.25
+default_gpu_memory: 31
+default_cpu: 3
+default_memory: 12
 gpu_types: v100,p4000
