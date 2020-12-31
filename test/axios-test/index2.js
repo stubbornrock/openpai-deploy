@@ -5,7 +5,7 @@ const qs = require('querystring');
 const fs = require('fs');
 const mustache = require('mustache');
 const { URL } = require('url');
-const { TKE_DEPLOYMENT,TKE_SERVICE } = require('./tkeDeploymentTemplate');
+const { TKE_DEPLOYMENT,TKE_SERVICE,TKE_NAMESPACES } = require('./tkeDeploymentTemplate');
 
 //系统常量,后续从配置文件获取
 const TKE_ENDPOINT = 'http://192.168.19.118';
@@ -157,9 +157,13 @@ const _generateTKEDeployment = (data) => {
     const serviceStr  = mustache.render(TKE_SERVICE,data);
     const serviceObj  = yaml.safeLoad(serviceStr);
 
+    const namespaceStr = mustache.render(TKE_NAMESPACES,data);
+    const namespaceObj  = yaml.safeLoad(namespaceStr);
+
     return {
         deploymentObj: deploymentObj, 
-        serviceObj: serviceObj
+        serviceObj: serviceObj,
+        namespaceObj: namespaceObj
     }
 }
 
@@ -172,6 +176,7 @@ const listTKEPVCs = async () => {
     pvcResp.items.forEach(item => pvcs.push(item.metadata.name));
     console.log(pvcs);
 }
+
 
 // 创建deployment
 const createTKEDeployment = async (username,deploymentName,vcudaCore=0.5,vcudaMemory=2) => {
@@ -186,9 +191,12 @@ const createTKEDeployment = async (username,deploymentName,vcudaCore=0.5,vcudaMe
         vcudaMemory: vcudaMemory,
         gpuType: 'aa'
     }
-    const {deploymentObj, serviceObj} = _generateTKEDeployment(data);
-    console.log(deploymentObj);
-    console.log(JSON.stringify(deploymentObj));
+    const {deploymentObj, serviceObj, namespaceObj} = _generateTKEDeployment(data);
+    //console.log(deploymentObj);
+    //console.log(JSON.stringify(deploymentObj));
+    console.log(namespaceObj);
+    const requestURL = '/apis/business.tkestack.io/v1/namespaces/prj-c2qnk8ll/namespaces'
+    _requestWithCookie(requestURL,'POST', namespaceObj);
     //const requestURL = `/apis/platform.tkestack.io/v1/clusters/${TKE_CLUSTER}/apply`
     //try {
     //    // 创建 deployment
@@ -222,64 +230,71 @@ const deleteTKEDeployment = async (deployment) => {
 // 列出所有的deployment
 const listTKEDeployment = async () => {
     // 获取deployments 列表
-    let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/deployments`
-    const deploymentResp = await _requestWithCookie(requestURL,'GET');
-    // 获取所有的services 列表
-    requestURL = `/api/v1/namespaces/${TKE_NAMESPACE}/services`
-    const serviceResp = await _requestWithCookie(requestURL,'GET');
-    let services = {}
-    serviceResp.items.forEach( element => {
-        let key = element.metadata.name;
-        services[key] = element;
-    });
-    // 返回客户端需要的信息
-    let deployments = [];
-    deploymentResp.items.forEach( element => {
-        // 计算持续天数
-        const createDate = new Date(element.metadata.creationTimestamp).getTime();
-        const nowDate = Date.now();
-        const durationDays = Math.ceil((nowDate - createDate) / (1000 * 3600 * 24));
-        // 计算资源规格
-        let resources = {}
-        const deploymentContainers = element.spec.template.spec.containers;
-        deploymentContainers.forEach( container => {
-            const limits = container.resources.limits;
-            for ( let [key, value] of Object.entries(limits) ) {
-                if ('tencent.com/vcuda-core' ===  key ) { 
-                    key = 'gpu';
-                    value = (value/100).toFixed(1);
-                } 
-                if ('tencent.com/vcuda-memory' ===  key ) { 
-                    key = 'gpu-memory';
-                    value = value * 256;
-                }
-                if (key in resources) {
-                    resources[key] += value;
-                } else {
-                    resources[key] = value;
-                }
-            }
-        });
-        let accessPort = null
-        // 获取服务端口号
-        try {
-	    accessPort = services[element.metadata.name].spec.ports[0].nodePort
-        } catch (error) {
-            console.log(`${element.metadata.name}获取访问端口失败`);
-        }
-        let deploy = {
-            name: element.metadata.name,
-            creationTimestamp: element.metadata.creationTimestamp,
-            durationDays: durationDays,
-            username: element.metadata.labels.username,
-            status: (element.status.readyReplicas >= 1) ? true : false,
-            resources: resources,
-            nodePort: accessPort
-        }
-        deployments.push(deploy);
-    });
-    console.log(deployments);
-    return deployments;
+    //let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/deployments/ai-desktop-aa45e6/pods`
+    let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/deployments/ai-desktop-95bba0/pods`
+    //let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/pods/`
+    const deploymentResp = await _requestWithCookie(requestURL, 'GET');
+    //console.log(typeof deploymentResp.items[0].metadata.annotations['tencent.com/gpu-assigned']);
+    console.log(deploymentResp.items[0].metadata.annotations);
+    if (deploymentResp.items[0].metadata.annotations['aaa'] && deploymentResp.items[0].metadata.annotations['aaa'] === true) {
+        console.log("ggg");
+    }
+    //// 获取所有的services 列表
+    //requestURL = `/api/v1/namespaces/${TKE_NAMESPACE}/services`
+    //const serviceResp = await _requestWithCookie(requestURL,'GET');
+    //let services = {}
+    //serviceResp.items.forEach( element => {
+    //    let key = element.metadata.name;
+    //    services[key] = element;
+    //});
+    //// 返回客户端需要的信息
+    //let deployments = [];
+    //deploymentResp.items.forEach( element => {
+    //    // 计算持续天数
+    //    const createDate = new Date(element.metadata.creationTimestamp).getTime();
+    //    const nowDate = Date.now();
+    //    const durationDays = Math.ceil((nowDate - createDate) / (1000 * 3600 * 24));
+    //    // 计算资源规格
+    //    let resources = {}
+    //    const deploymentContainers = element.spec.template.spec.containers;
+    //    deploymentContainers.forEach( container => {
+    //        const limits = container.resources.limits;
+    //        for ( let [key, value] of Object.entries(limits) ) {
+    //            if ('tencent.com/vcuda-core' ===  key ) { 
+    //                key = 'gpu';
+    //                value = (value/100).toFixed(1);
+    //            } 
+    //            if ('tencent.com/vcuda-memory' ===  key ) { 
+    //                key = 'gpu-memory';
+    //                value = value * 256;
+    //            }
+    //            if (key in resources) {
+    //                resources[key] += value;
+    //            } else {
+    //                resources[key] = value;
+    //            }
+    //        }
+    //    });
+    //    let accessPort = null
+    //    // 获取服务端口号
+    //    try {
+    //        accessPort = services[element.metadata.name].spec.ports[0].nodePort
+    //    } catch (error) {
+    //        console.log(`${element.metadata.name}获取访问端口失败`);
+    //    }
+    //    let deploy = {
+    //        name: element.metadata.name,
+    //        creationTimestamp: element.metadata.creationTimestamp,
+    //        durationDays: durationDays,
+    //        username: element.metadata.labels.username,
+    //        status: (element.status.readyReplicas >= 1) ? true : false,
+    //        resources: resources,
+    //        nodePort: accessPort
+    //    }
+    //    deployments.push(deploy);
+    //});
+    //console.log(deployments);
+    //return deployments;
 }
 
 const getTKEDeployment = async (deploymentName) => {
@@ -369,11 +384,38 @@ const getTKEDeployment = async (deploymentName) => {
     }
 }
 
+// 列出所有的镜像
+const listAllImages = async (namespaceName='aidesktop') => {
+    // 获取namespace
+    const requestURL = '/apis/registry.tkestack.io/v1/namespaces/';
+    const namespaceList = await _requestWithCookie(requestURL,'GET');
+    const filterNamespaceList = namespaceList.items.filter(namespace => namespace.spec.name === namespaceName);
+    // 获取镜像列表
+    let images = [];
+    if (filterNamespaceList.length !== 0) {
+        const namespaceId = filterNamespaceList[0].metadata.name;
+        const requestURL = `/apis/registry.tkestack.io/v1/namespaces/${namespaceId}/repositories`;
+        const repositoryList = await _requestWithCookie(requestURL,'GET');
+        repositoryList.items.forEach( repo => {
+            const namespaceName = repo.spec.namespaceName;
+            const name = repo.spec.name;
+            const tags = repo.status.tags;
+            tags.forEach(tag => {
+                const imageFullName = `${namespaceName}/${name}:${tag.name}`
+                images.push(imageFullName);
+            });
+        });
+    }
+    return images;
+}
+
+images = listAllImages()
+console.log(images);
 //createTKEDeployment('chengs001');
 //deleteTKEDeployment('chengs');
 //listTKEDeployment();
 //listTKEPVCs()
-getTKEDeployment('ai-desktop-59d8ac')
+//getTKEDeployment('ai-desktop-59d8ac')
 
 //ENDPOINT=`http://192.168.19.118/?username=chengs&password=Chengshuai123!@#&cluster=cls-mdbrcg5b&namespace=gongdan&image=latest`;
 //

@@ -41,17 +41,55 @@ rest-server:
   default-pai-admin-password: admin-password
 
   # tkestack conifgs
-  tkestack-uri: http://192.168.19.118
-  tkestack-auth-username: chengs
-  tkestack-auth-password: Chengshuai123!@#
-  tkestack-cluster: cls-mdbrcg5b
-  tkestack-namespace: gongdan
-  tkestack-storage: ctpai-nfs-storage
-  tkestack-image: tkeregistry.teleaip.cn/library/mltooling/ml-workspace-gpu:ctbri
-  tkestack-hosts: 192.168.19.119,192.168.19.115
-  tkestack-total-gpu: 18
-  tkestack-total-gpu-memory: 720
-
+  tkestack:
+    uri: http://192.168.19.118
+    username: chengs
+    password: Chengshuai123!@#
+    aidesktop:
+      cluster: cls-mdbrcg5b
+      namespace: gongdan
+      storage: ctpai-nfs-storage
+      image: tkeregistry.teleaip.cn/library/mltooling/ml-workspace-gpu:ctbriv3
+      hosts: 192.168.19.119,192.168.19.115
+      default-cpu: 2
+      default-memory: 8
+      default-gpu: 0.25
+      default-gpu-memory: 16
+      total-gpu: 18
+      total-gpu-memory: 2048
+      gpu-types: v100,p4000
+      registry: tkeregistry #tkeregistry|harbor
+    application:
+      cluster: cls-mdbrcg5b
+      project: prj-c2qnk8ll
+  # tkeregistry configs
+  tkeregistry:
+    uri: http://tkeregistry.teleaip.cn/
+    principal: admin
+    password: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDkxMjIxNDQsImp0aSI6IjUyMmQiLCJpYXQiOjE2MDM4NjYxNDQsInVzciI6ImNoZW5ncyIsInRlZCI6ImRlZmF1bHQifQ.iFfeBeEIK19gMYfZqGZz_zSfBxlEVmupn2uRrHu5J5hHX8f3TIFAiwPrz1CGGAQxF02NhKR4cM2cpzs8ettPbojNI4y8-jeT8YVGMMabZWlDVsEFU-MtWC3ETKH0YVRvr9vLeibc3mdbQEGAYmQVajihF_FMe5QXqHAo9r74Ax-IsU_hFBgNiaySt6HhXLq8kFCf4Hnz9eVgIf-RtJlJKUz4uDYWxug6mvoYVEjJsKLyMcho5urlslUaiCvsePndDpYeWuM9e08C_SbUByP1z6-p3cDxQ39VqEOyrYcSZs1E8GsJaFJ8maN7XFTrO8CatbaAW-p5EB9-lXpaC6LWyg
+  # harbor configs
+  harbor:
+    uri: http://192.168.21.228
+    principal: admin
+    password: Harbor12345
+    login-url: /login/
+  # kong configs
+  kong:
+    uri: http://192.168.19.119:31394
+  # ai-account
+  ai-account:
+    url: http://ctbriai-account-service
+    sign: aaece5f6e71a54f3ae869048eb28ddecae4d43d60612edd8c552d31c04eba25b
+  # docker-build
+  docker-build:
+    host: 192.168.21.228
+    port: 5678
+    protocol: http
+  # storage configs
+  nfs-storage-enable: true
+  nfs-storage-server: 192.168.21.240
+  nfs-storage-path: /mnt/pool_main/
+  nfs-storage-mount: /pai-uploads-storage/
 webportal:
   plugins:
   - id: submit-job-v2
@@ -190,7 +228,8 @@ authentication:
 # uncomment following section if you want to customize the port of pylon
 pylon:
   port: 80
-  dataset-url: http://192.168.21.228:9000
+  terminal-server-url: http://192.168.19.119:30753
+  filemanager-url: http://192.168.21.228:9000
   registry-url: http://192.168.21.228:8080
   application-auth-url: https://192.168.19.118
   application-web-url: https://192.168.19.118:8443

@@ -1,0 +1,4 @@
+uri: http://192.168.21.228
+principal: admin
+password: Harbor12345
+loginUrl: /login/

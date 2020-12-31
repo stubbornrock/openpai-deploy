@@ -18,6 +18,18 @@ cat ./restserver-dev-configs/k8s-job-exit-spec-configuration/k8s-job-exit-spec.y
 mkdir -p ${BASE_PATH}/tkestack-configuration
 cat ./restserver-dev-configs/tkestack-configuration/tkestack.yaml > ${BASE_PATH}/tkestack-configuration/tkestack.yaml
 
+mkdir -p ${BASE_PATH}/harbor-configuration
+cat ./restserver-dev-configs/harbor-configuration/harbor.yaml > ${BASE_PATH}/harbor-configuration/harbor.yaml
+
+mkdir -p ${BASE_PATH}/konga-configuration
+cat ./restserver-dev-configs/konga-configuration/konga.yaml > ${BASE_PATH}/konga-configuration/konga.yaml
+
+mkdir -p ${BASE_PATH}/user-configuration
+cat ./restserver-dev-configs/user-configuration/user.yaml > ${BASE_PATH}/user-configuration/user.yaml
+
+mkdir -p ${BASE_PATH}/docker-build-configuration
+cat ./restserver-dev-configs/docker-build-configuration/docker-build.yaml > ${BASE_PATH}/docker-build-configuration/docker-build.yaml
+
 mkdir -p ~/.kube/
 cat ./restserver-dev-configs/.kube/config > ~/.kube/config
 

@@ -34,6 +34,8 @@ ${OPENPAI_PROJECT}/webportal:${IMAGE_TAG}\n
 ${OPENPAI_PROJECT}/kube-runtime:${IMAGE_TAG}\n"
 
 independent="
+mirrorgooglecontainers/kubernetes-dashboard-amd64:v1.10.1\n
+busybox:1.31.1\n
 prom/alertmanager:v0.15.1\n
 frameworkcontroller/frameworkcontroller:v0.6.0\n
 everpeace/k8s-host-device-plugin:latest\n

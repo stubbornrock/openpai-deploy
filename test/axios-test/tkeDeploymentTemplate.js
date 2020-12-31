@@ -70,8 +70,17 @@ spec:
     ctpai-app: {{ name }}
     username: {{ username }}`
 
+const TKE_NAMESPACES = `
+apiVersion: business.tkestack.io/v1
+kind: Namespace
+spec:
+  clusterName: cls-mdbrcg5b
+  namespace: gogo3
+  projectName: prj-c2qnk8ll`
+
 // module exports
 module.exports = {
     TKE_DEPLOYMENT,
-    TKE_SERVICE
+    TKE_SERVICE,
+    TKE_NAMESPACES
 }

@@ -1,0 +1,17 @@
+{
+  "name": "axios-docker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "docker": "^1.0.0",
+    "node-docker-api": "^1.1.22",
+    "tar-fs": "^2.1.0",
+    "url": "^0.11.0"
+  }
+}

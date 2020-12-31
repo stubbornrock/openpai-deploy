@@ -4,5 +4,5 @@ cluster:
       namespace: openpai
       username: admin
       password: Harbor12345
-      tag: ctbriv1-20200814
+      tag: ctbriv1-20201231
       secret-name: 7bee487bdd6f7e6a074660c80716f1ff

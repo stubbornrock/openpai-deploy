@@ -1,4 +1,8 @@
 pai/
-ctbriai-account/
+components/
 kubespray/
+test/axios-harbor/node_modules/
+test/axios-docker/node_modules/
 test/ai-users.txt
+.kube/http-cache/
+.kube/http-cache/*
