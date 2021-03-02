@@ -25,3 +25,7 @@ pushd ${BUILD_DIR} > /dev/null
 ./pai_build.py build -c ${TMP_DIR} -s ${service}
 ./pai_build.py push  -c ${TMP_DIR} -i ${service}
 popd > /dev/null
+
+#push
+docker tag ${service}:latest 192.168.19.31/teleaip/${service}:ctbriv1-${tag}
+docker push 192.168.19.31/teleaip/${service}:ctbriv1-${tag}

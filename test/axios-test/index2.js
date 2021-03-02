@@ -8,10 +8,10 @@ const { URL } = require('url');
 const { TKE_DEPLOYMENT,TKE_SERVICE,TKE_NAMESPACES } = require('./tkeDeploymentTemplate');
 
 //系统常量,后续从配置文件获取
-const TKE_ENDPOINT = 'http://192.168.19.118';
-const TKE_AUTH = { login: 'chengs', password: 'Chengshuai123!@#', tenant: 'default' };
-const TKE_CLUSTER = 'cls-mdbrcg5b';
-const TKE_NAMESPACE = 'gongdan';
+const TKE_ENDPOINT = 'http://192.168.21.235';
+const TKE_AUTH = { login: 'admin', password: 'Kaifa123!@#', tenant: 'default' };
+const TKE_CLUSTER = 'cls-rdvfv92b';
+const TKE_NAMESPACE = 'cash';
 const VNC_IMAGE = 'nginx:latest';
 
 const REQUEST_COOKIES_RETRIES = 5;
@@ -231,14 +231,14 @@ const deleteTKEDeployment = async (deployment) => {
 const listTKEDeployment = async () => {
     // 获取deployments 列表
     //let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/deployments/ai-desktop-aa45e6/pods`
-    let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/deployments/ai-desktop-95bba0/pods`
+    let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/deployments/`
     //let requestURL = `/apis/apps/v1/namespaces/${TKE_NAMESPACE}/pods/`
     const deploymentResp = await _requestWithCookie(requestURL, 'GET');
     //console.log(typeof deploymentResp.items[0].metadata.annotations['tencent.com/gpu-assigned']);
-    console.log(deploymentResp.items[0].metadata.annotations);
-    if (deploymentResp.items[0].metadata.annotations['aaa'] && deploymentResp.items[0].metadata.annotations['aaa'] === true) {
-        console.log("ggg");
-    }
+    console.log(deploymentResp);
+    //if (deploymentResp.items[0].metadata.annotations['aaa'] && deploymentResp.items[0].metadata.annotations['aaa'] === true) {
+    //    console.log("ggg");
+    //}
     //// 获取所有的services 列表
     //requestURL = `/api/v1/namespaces/${TKE_NAMESPACE}/services`
     //const serviceResp = await _requestWithCookie(requestURL,'GET');
@@ -409,11 +409,11 @@ const listAllImages = async (namespaceName='aidesktop') => {
     return images;
 }
 
-images = listAllImages()
-console.log(images);
+//images = listAllImages()
+//console.log(images);
 //createTKEDeployment('chengs001');
 //deleteTKEDeployment('chengs');
-//listTKEDeployment();
+listTKEDeployment();
 //listTKEPVCs()
 //getTKEDeployment('ai-desktop-59d8ac')
 

@@ -64,9 +64,9 @@ rest-server:
       project: prj-c2qnk8ll
   # tkeregistry configs
   tkeregistry:
-    uri: http://tkeregistry.teleaip.cn/
+    uri: http://192.168.19.118/
     principal: admin
-    password: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDkxMjIxNDQsImp0aSI6IjUyMmQiLCJpYXQiOjE2MDM4NjYxNDQsInVzciI6ImNoZW5ncyIsInRlZCI6ImRlZmF1bHQifQ.iFfeBeEIK19gMYfZqGZz_zSfBxlEVmupn2uRrHu5J5hHX8f3TIFAiwPrz1CGGAQxF02NhKR4cM2cpzs8ettPbojNI4y8-jeT8YVGMMabZWlDVsEFU-MtWC3ETKH0YVRvr9vLeibc3mdbQEGAYmQVajihF_FMe5QXqHAo9r74Ax-IsU_hFBgNiaySt6HhXLq8kFCf4Hnz9eVgIf-RtJlJKUz4uDYWxug6mvoYVEjJsKLyMcho5urlslUaiCvsePndDpYeWuM9e08C_SbUByP1z6-p3cDxQ39VqEOyrYcSZs1E8GsJaFJ8maN7XFTrO8CatbaAW-p5EB9-lXpaC6LWyg
+    password: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MjUzNTM0MTIsImp0aSI6ImVkZjIiLCJpYXQiOjE2MDk5OTM0MTIsInVzciI6ImNoZW5ncyIsInRlZCI6ImRlZmF1bHQifQ.IC2EuQv-3myBlLNgqsUk3o9mj5JdIlmvZpZfC46lPFo_5sV15WXj71Jv1fEgY6QulGxfqQAMX_GkuNYSFYFNLJPMfeernV9yg1M6Korv_LuWq8vGAFm-OQiDw9Z4cdh2jRF9291a7ZxViEsFlDH1XDQvghkT34D7zG4C5u1M5cfmiPMNGqsEgS70bYeAbsP7_0Qn-IFOiBQRO0JwbboqOk-FKizHoU7kmMHaUPfUijix9kqAnldBjySE5b4UFzOdonZPaxVH7FLhEEmbpVUetaJXonstXrzjkGjiZRpbu0XeaHqYDL5KjMUYXY-fG1JCHDa2kM_pQze5DcKoSoQlvw
   # harbor configs
   harbor:
     uri: http://192.168.21.228
@@ -82,7 +82,7 @@ rest-server:
     sign: aaece5f6e71a54f3ae869048eb28ddecae4d43d60612edd8c552d31c04eba25b
   # docker-build
   docker-build:
-    host: 192.168.21.228
+    host: 192.168.19.102
     port: 5678
     protocol: http
   # storage configs
