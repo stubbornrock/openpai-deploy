@@ -1,3 +1,22 @@
+# Copyright (c) Microsoft Corporation
+# All rights reserved.
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+# to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
 - code: 0
   phrase: Succeeded
   issuer: USER_CONTAINER
@@ -43,14 +62,14 @@
 
 
 - code: -110
-  phrase: ConfigMapCreationTimeout
+  phrase: ConfigMapLocalCacheCreationTimeout
   issuer: PAI_FC
   causer: PAI_UNKNOWN
   type: PLATFORM_FAILURE
   stage: LAUNCHING
   behavior: TRANSIENT
   reaction: ALWAYS_RETRY
-  reason: "The ConfigMap of this job attempt creation timeout, maybe K8S ApiServer is down"
+  reason: "The ConfigMap of this job attempt does not appear in local cache within timeout, maybe K8S ApiServer is down"
   repro:
     - "Just after FC created a ConfigMap, bring down the K8S ApiServer"
   solution:
@@ -59,14 +78,14 @@
 
 
 - code: -111
-  phrase: PodCreationTimeout
+  phrase: PodLocalCacheCreationTimeout
   issuer: PAI_FC
   causer: PAI_UNKNOWN
   type: PLATFORM_FAILURE
   stage: LAUNCHING
   behavior: TRANSIENT
   reaction: ALWAYS_RETRY
-  reason: "Pod creation timeout, maybe K8S ApiServer is down"
+  reason: "Pod does not appear in local cache within timeout, maybe K8S ApiServer is down"
   repro:
     - "Just after FC created a Pod, bring down the K8S ApiServer"
   solution:
@@ -74,15 +93,31 @@
     - "Contact Cluster Admin"
 
 
+- code: -120
+  phrase: PodCreationTransientError
+  issuer: PAI_FC
+  causer: PAI_UNKNOWN
+  type: PLATFORM_FAILURE
+  stage: LAUNCHING
+  behavior: TRANSIENT
+  reaction: ALWAYS_RETRY
+  reason: "Failed to create Pod due to transient error"
+  repro:
+    - "Just before FC create a Pod, bring down the K8S ApiServer"
+  solution:
+    - "Wait result from next retry"
+    - "Contact Cluster Admin"
+
+
 - code: -200
-  phrase: PodSpecPermanentError
+  phrase: PodCreationPermanentError
   issuer: PAI_FC
   causer: USER_SUBMISSION
   type: USER_FAILURE
   stage: SUBMITTING
   behavior: PERMANENT
   reaction: NEVER_RETRY
-  reason: "Pod spec contains permanent error"
+  reason: "Failed to create Pod due to permanent error, maybe the Pod spec is invalid"
   repro:
     - "Specify a Pod in Framework with duplicated container names"
   solution:
@@ -110,9 +145,23 @@
   stage: UNKNOWN
   behavior: PERMANENT
   reaction: NEVER_RETRY
-  reason: "Stop to complete current FrameworkAttempt"
+  reason: "Stop to complete current job attempt"
   repro:
     - "Stop a job with long running container"
+
+
+- code: -230
+  phrase: DeleteTaskRequested
+  issuer: PAI_FC
+  causer: USER_SCALEDOWN
+  type: USER_STOP
+  stage: UNKNOWN
+  behavior: PERMANENT
+  reaction: NEVER_RETRY
+  reason: "User has requested to delete the Task by Job ScaleDown"
+  repro:
+    - "ScaleDown a job with long running container"
+
 
 - code: -300
   phrase: PodFailedWithoutFailedContainer
@@ -125,6 +174,23 @@
   reason: "Pod failed but without any failed container, may be stopped by K8S"
   repro:
     - "Submit a job which will be rejected by kubelet"
+  solution:
+    - "Check diagnostics and find root cause"
+    - "Wait result from next retry"
+    - "Contact Cluster Admin"
+
+
+- code: -310
+  phrase: PodCreationUnknownError
+  issuer: PAI_FC
+  causer: UNKNOWN
+  type: UNKNOWN_FAILURE
+  stage: LAUNCHING
+  behavior: UNKNOWN
+  reaction: RETRY_TO_MAX
+  reason: "Failed to create Pod due to unknown error"
+  repro:
+    - "Submit a job and then immediately delete its priority class object"
   solution:
     - "Check diagnostics and find root cause"
     - "Wait result from next retry"
@@ -213,6 +279,7 @@
     -
       reasonRegex: '(?i)^Preempting$'
       messageRegex: '(?ms).*'
+
 
 - code: -1004
   phrase: PodDeadlineExceeded
@@ -411,8 +478,9 @@
       -
         nameRegex: '(?ms).*'
         reasonRegex: '(?i)^ContainerCannotRun$'
-        messageRegex: '(?msi).*(not found|cannot find|no such).*'
+        messageRegex: '(?mi).*(not found|cannot find|no such).*'
         exitCode: 128
+
 
 - code: -1204
   phrase: ContainerDockerStartUnknownError
@@ -461,8 +529,27 @@
       -
         nameRegex: '(?ms).*'
         reasonRegex: '(?i)^ContainerCannotRun$'
-        messageRegex: '(?msi).*(nvidia-container-cli: device error: unknown device id).*'
+        messageRegex: '(?mi).*(nvidia-container-cli: device error: unknown device id).*'
         exitCode: 128
+
+
+- code: 128
+  phrase: ContainerMayFailDueToGpuDeviceEccError
+  issuer: USER_CONTAINER
+  causer: PAI_HW
+  type: PLATFORM_FAILURE
+  stage: RUNNING
+  behavior: UNKNOWN
+  reaction: RETRY_TO_MAX
+  reason: "Container failed may due to GPU ecc error"
+  repro:
+    - "Run program in GPU with ECC error"
+  solution:
+    - "Wait result from next retry"
+    - "Contact Cluster Admin"
+  pattern:
+    runtimeContainerPatterns:
+    -
 
 
 - code: 130
@@ -600,19 +687,22 @@
     runtimeContainerPatterns:
     -
       exitCode: 137
+
+
 - code: 139
   phrase: ContainerSigSegvReceived
   issuer: USER_CONTAINER
-  causer: USER_CONTAINER
-  type: USER_FAILURE
+  causer: UNKNOWN
+  type: UNKNOWN_FAILURE
   stage: RUNNING
-  behavior: PERMANENT
-  reaction: NEVER_RETRY
+  behavior: UNKNOWN
+  reaction: RETRY_TO_MAX
   reason: "Container killed by OS Signal: SIGSEGV"
   repro:
     - "User program accesses an illegal memory address"
   solution:
     - "Check container log and fix your program bug"
+    - "Contact Cluster Admin"
   pattern:
     runtimeContainerPatterns:
     -
@@ -697,7 +787,7 @@
   pattern:
     runtimeContainerPatterns:
     -
-      userLogRegex: '(?msi)tensorflow.*ResourceExhaustedError.*OOM.*'
+      userLogRegex: '(?mi)tensorflow.*ResourceExhaustedError.*OOM.*'
     -
       userLogRegex: '(?i)ran out of memory trying to allocate'
 
@@ -718,7 +808,7 @@
   pattern:
     runtimeContainerPatterns:
     -
-      userLogRegex: '(?msi)Signal code: Address not mapped.*'
+      userLogRegex: '(?mi)Signal code: Address not mapped.*'
 
 
 - code: 223
@@ -738,7 +828,7 @@
   pattern:
     runtimeContainerPatterns:
     -
-      userLogRegex: '(?msi)CUDA_ERROR_ECC_UNCORRECTABLE.*'
+      userLogRegex: '(?mi)CUDA_ERROR_ECC_UNCORRECTABLE.*'
 
 
 - code: 224
@@ -800,25 +890,6 @@
       userLogRegex: '(?i)cuda runtime error (2) : out of memory'
 
 
-- code: 227
-  phrase: ContainerMayFailDueToGpuDeviceEccError
-  issuer: PAI_RUNTIME
-  causer: PAI_HW
-  type: PLATFORM_FAILURE
-  stage: RUNNING
-  behavior: TRANSIENT
-  reaction: RETRY_TO_MAX
-  reason: "Container failed may due to GPU ecc error"
-  repro:
-    - "Run program in GPU with ECC error"
-  solution:
-    - "Wait result from next retry"
-    - "Contact Cluster Admin"
-  pattern:
-    runtimeContainerPatterns:
-    -
-
-
 - code: 228
   phrase: ContainerIncorrectParameterError
   issuer: PAI_RUNTIME
@@ -839,11 +910,12 @@
     -
       userLogRegex: '(?i)typeerror: dynamic_rnn() got multiple values for keyword argument'
     -
-      userLogRegex: '(?msi)bad argument #2 to .*'
+      userLogRegex: '(?mi)bad argument #2 to .*'
     -
       userLogRegex: '(?i)invalid argument:'
     -
       userLogRegex: '(?i)option -start_symbol has no default value'
+
 
 - code: 229
   phrase: ContainerIncorrectDataModelError
@@ -879,15 +951,13 @@
     -
       userLogRegex: '(?i)eoferror: ran out of input'
     -
-      userLogRegex: '(?msi)utils.lua:.*input/output error'
+      userLogRegex: '(?mi)utils.lua:.*input/output error'
     -
-      userLogRegex: '(?msi)tensorflow.python.framework.errors.unknownerror:.*input/output error'
+      userLogRegex: '(?mi)tensorflow.python.framework.errors.unknownerror:.*input/output error'
     -
-      userLogRegex: '(?msi)oserror:.*input/output error'
+      userLogRegex: '(?mi)cp: failed to close.*input/output error'
     -
-      userLogRegex: '(?msi)cp: failed to close.*input/output error'
-    -
-      userLogRegex: '(?msi)exception occurred:.* Input/output error'
+      userLogRegex: '(?mi)exception occurred:.* Input/output error'
 
 
 - code: 230
@@ -931,11 +1001,11 @@
     -
       userLogRegex: '(?i)assign requires shapes of both tensors to match'
     -
-      userLogRegex: '(?msi)torch/install/share/lua.*c.* exception'
+      userLogRegex: '(?mi)torch/install/share/lua.*c.* exception'
     -
-      userLogRegex: '(?msi)attributeerror:.*has no attribute'
+      userLogRegex: '(?mi)attributeerror:.*has no attribute'
     -
-      userLogRegex: '(?msi)nameerror: name.* is not defined'
+      userLogRegex: '(?mi)nameerror: name.* is not defined'
 
 
 - code: 232
@@ -954,7 +1024,7 @@
   pattern:
     runtimeContainerPatterns:
     -
-      userLogRegex: '(?msi)importerror:.*'
+      userLogRegex: '(?mi)importerror:.*'
 
 
 - code: 233
@@ -973,7 +1043,7 @@
   pattern:
     runtimeContainerPatterns:
     -
-      userLogRegex: '(?msi)indexerror:.*index out of range'
+      userLogRegex: '(?mi)indexerror:.*index out of range'
 
 
 - code: 234
@@ -1156,3 +1226,5 @@
     - "PAI Runtime exits with exitcode 1"
   solution:
     - "Contact PAI Dev to fix PAI Runtime bugs"
+
+

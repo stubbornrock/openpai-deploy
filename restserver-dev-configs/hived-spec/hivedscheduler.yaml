@@ -2,35 +2,42 @@ webServerAddress: ":30096"
 waitingPodSchedulingBlockMilliSec: 50
 physicalCluster:
   skuTypes:
-    DT:
+    gpu-machine:
       gpu: 1
-      cpu: 1
-      memory: 1024Mi
-    CPU:
-      cpu: 1
-      memory: 10240Mi
+      cpu: 4
+      memory: 4096Mi
+    cpu-machine:
+      gpu: 0
+      cpu: 4
+      memory: 4096Mi
   cellTypes:
-    DT-NODE:
-      childCellType: DT
-      childCellNumber: 15
-      isNodeLevel: true
-    DT-NODE-POOL:
-      childCellType: DT-NODE
+    gpu-machine-NODE:
+      childCellType: gpu-machine
       childCellNumber: 2
-    CPU-NODE:
-      childCellType: CPU
-      childCellNumber: 16
       isNodeLevel: true
-    CPU-NODE-POOL:
-      childCellType: CPU-NODE
+    cpu-machine-NODE:
+      childCellType: cpu-machine
       childCellNumber: 2
+      isNodeLevel: true
+    gpu-machine-NODE-POOL:
+      childCellType: gpu-machine-NODE
+      childCellNumber: 1
+    cpu-machine-NODE-POOL:
+      childCellType: cpu-machine-NODE
+      childCellNumber: 1
   physicalCells:
-  - cellType: CPU-NODE-POOL
+  - cellType: gpu-machine-NODE-POOL
     cellChildren:
-    - cellAddress: k8s01
-    - cellAddress: k8s02
+    - cellAddress: 192.168.19.116
+  - cellType: cpu-machine-NODE-POOL
+    cellChildren:
+    - cellAddress: 192.168.21.236
 virtualClusters:
-  default:
-    virtualCells:
-    - cellType: CPU-NODE-POOL.CPU-NODE
-      cellNumber: 2
+    default:
+      virtualCells:
+      - cellType: gpu-machine-NODE-POOL.gpu-machine-NODE
+        cellNumber: 1
+    cpuvc:
+      virtualCells:
+      - cellType: cpu-machine-NODE-POOL.cpu-machine-NODE
+        cellNumber: 1

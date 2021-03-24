@@ -1,0 +1,27 @@
+uri: http://192.168.19.118
+username: chengs
+password: Chengshuai123!@#
+aidesktop:
+  cluster: cls-mdbrcg5b
+  namespace: gongdan
+  image: tkeregistry.teleaip.cn/library/mltooling/ml-workspace-gpu:ctbriv2
+  storage: ctpai-nfs-storage
+  hosts: 192.168.19.119,192.168.19.115
+  total_gpu: 15
+  total_gpu_memory: 1023
+  default_gpu: 0.25
+  default_gpu_memory: 31
+  default_cpu: 3
+  default_memory: 12
+  gpu_types: v100,p4000
+  nfs_hosts: 192.168.21.240
+  nfs_path: /mnt/pool_main/
+  nfs: True
+  registry: tkeregistry
+application:
+  cluster: cls-mdbrcg5b
+  project: prj-jf9pmf2h
+tkeregistry:
+  uri: http://tkeregistry.teleaip.cn/
+  principal: tkestack
+  password: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDkxMjIxNDQsImp0aSI6IjUyMmQiLCJpYXQiOjE2MDM4NjYxNDQsInVzciI6ImNoZW5ncyIsInRlZCI6ImRlZmF1bHQifQ.iFfeBeEIK19gMYfZqGZz_zSfBxlEVmupn2uRrHu5J5hHX8f3TIFAiwPrz1CGGAQxF02NhKR4cM2cpzs8ettPbojNI4y8-jeT8YVGMMabZWlDVsEFU-MtWC3ETKH0YVRvr9vLeibc3mdbQEGAYmQVajihF_FMe5QXqHAo9r74Ax-IsU_hFBgNiaySt6HhXLq8kFCf4Hnz9eVgIf-RtJlJKUz4uDYWxug6mvoYVEjJsKLyMcho5urlslUaiCvsePndDpYeWuM9e08C_SbUByP1z6-p3cDxQ39VqEOyrYcSZs1E8GsJaFJ8maN7XFTrO8CatbaAW-p5EB9-lXpaC6LWyg

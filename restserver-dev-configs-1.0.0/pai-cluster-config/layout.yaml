@@ -1,0 +1,38 @@
+# kubernetes api server and dashboard
+kubernetes:
+  api-servers-url: https://192.168.19.33:6443
+  dashboard-url: https://192.168.19.33:9090
+
+# TODO please modify it according to your own hardware
+machine-sku:
+  GENERIC-MASTER:
+    mem: 1
+    gpu:
+      type: generic
+      count: 1
+    cpu:
+      vcore: 1
+    os: centos7.5
+
+  GENERIC-WORKER:
+    mem: 1
+    gpu:
+      type: generic
+      count: 1
+    cpu:
+      vcore: 1
+    os: centos7.5
+
+machine-list:
+    - hostname: k8s01
+      nodename: k8s01
+      hostip: 192.168.19.33
+      machine-type: GENERIC-MASTER
+      dashboard: "true"
+      pai-master: "true"
+      pai-worker: "true"
+    - hostname: k8s02
+      nodename: k8s02
+      hostip: 192.168.19.34
+      machine-type: GENERIC-WORKER
+      pai-worker: "true"

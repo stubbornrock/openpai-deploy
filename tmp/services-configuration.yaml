@@ -1,8 +1,8 @@
 cluster:
    docker-registry:
-      domain: 192.168.21.228
+      domain: 192.168.24.21
       namespace: openpai
       username: admin
       password: Harbor12345
-      tag: ctbriv1-20210114
+      tag: ctbriv15-20210324
       secret-name: 7bee487bdd6f7e6a074660c80716f1ff

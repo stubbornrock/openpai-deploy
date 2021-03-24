@@ -1,4 +1,8 @@
 #!/bin/bash
+
+HARBOR="192.168.24.21"
+TAG_BASE="ctbriv15"
+
 PWD=`pwd`
 BUILD_DIR=${PWD}/pai/build/
 TMP_DIR=${PWD}/tmp
@@ -18,14 +22,16 @@ service=$1
 mkdir -p ${TMP_DIR}
 tag=`date +"%Y%m%d"`
 cp pai-build.yaml ${TMP_DIR}/services-configuration.yaml
-sed -i "s/tag: .*/tag: ctbriv1-${tag}/g" ${TMP_DIR}/services-configuration.yaml
+sed -i "s/tag: .*/tag: ${TAG_BASE}-${tag}/g" ${TMP_DIR}/services-configuration.yaml
 
 #build
+rm -rf $COMPONENT_DIR}/${service}/.env
+
 pushd ${BUILD_DIR} > /dev/null
 ./pai_build.py build -c ${TMP_DIR} -s ${service}
 ./pai_build.py push  -c ${TMP_DIR} -i ${service}
 popd > /dev/null
 
 #push
-docker tag ${service}:latest 192.168.19.31/teleaip/${service}:ctbriv1-${tag}
-docker push 192.168.19.31/teleaip/${service}:ctbriv1-${tag}
+#docker tag ${service}:latest ${HARBOR}/teleaip/${service}:ctbriv1-${tag}
+#docker push ${HARBOR}/teleaip/${service}:ctbriv1-${tag}

@@ -6,17 +6,15 @@ cluster:
     job-history: "true"
     data-path: "/datastorage"
     qos-switch: "false"
-    docker-data-root: "/mnt/docker"
+    docker-data-root: "/var/lib/docker"
 
   # the docker registry to store docker images that contain system services like frameworklauncher, hadoop, etc.
   docker-registry:
-
     # The namespace in your registry. If the registry is docker.io, the namespace will be your user account.
     namespace: openpai
-
     # E.g., gcr.io.
     # if the registry is hub.docker, please fill this value with docker.io
-    domain: 192.168.21.228
+    domain: 192.168.24.21
     # If the docker registry doesn't require authentication, please comment username and password
     
     #username: <username>
@@ -25,7 +23,7 @@ cluster:
     #password: <password>
     
 
-    tag: v1.0.0
+    tag: v1.5.0
 
     # The name of the secret in kubernetes will be created in your cluster
     # Must be lower case, e.g., regsecret.
@@ -40,72 +38,56 @@ rest-server:
   # database admin password
   default-pai-admin-password: admin-password
 
-  # tkestack conifgs
-  tkestack-uri: http://192.168.19.118
-  tkestack-auth-username: chengs
-  tkestack-auth-password: Chengshuai123!@#
-  tkestack-cluster: cls-mdbrcg5b
-  tkestack-namespace: gongdan
-  tkestack-storage: ctpai-nfs-storage
-  tkestack-image: tkeregistry.teleaip.cn/library/mltooling/ml-workspace-gpu:ctbri
-  tkestack-hosts: 192.168.19.119,192.168.19.115
-  tkestack-total-gpu: 18
-  tkestack-total-gpu-memory: 720
 
 webportal:
-  plugins:
-  - id: submit-job-v2
-    title: 提交作业V2
-    uri: http://192.168.19.33:32767/marketplace/plugin.js
-  - id: marketplace
-    title: 模板仓库
-    uri: http://192.168.19.33:32767/marketplace/plugin.js
   server-port: 9286
 
-internal-storage:
-  enable: true
+# If you want to customize the scheduling config, such add more virtual clusters or more gpu types, check:
+# https://github.com/microsoft/pai/blob/master/docs/manual/cluster-admin/how-to-set-up-virtual-clusters.md
 
-postgresql:
-  enable: true
-
-#If you want to customize the scheduling config, such add more virtual clusters or more gpu types, check:
-#https://github.com/microsoft/pai/blob/master/docs/hivedscheduler/devops.md
 hivedscheduler:
   config: |
     physicalCluster:
       skuTypes:
-        DT:
+        gpu-machine:
           gpu: 1
-          cpu: 1
-          memory: 1024Mi
-        CPU:
-          cpu: 1
-          memory: 10240Mi
+          cpu: 4
+          memory: 4096Mi
+        cpu-machine:
+          gpu: 0
+          cpu: 4
+          memory: 4096Mi
       cellTypes:
-        DT-NODE:
-          childCellType: DT
-          childCellNumber: 15
-          isNodeLevel: true
-        DT-NODE-POOL:
-          childCellType: DT-NODE
+        gpu-machine-NODE:
+          childCellType: gpu-machine
           childCellNumber: 2
-        CPU-NODE:
-          childCellType: CPU
-          childCellNumber: 16
           isNodeLevel: true
-        CPU-NODE-POOL:
-          childCellType: CPU-NODE
+        cpu-machine-NODE:
+          childCellType: cpu-machine
           childCellNumber: 2
+          isNodeLevel: true
+        gpu-machine-NODE-POOL:
+          childCellType: gpu-machine-NODE
+          childCellNumber: 1
+        cpu-machine-NODE-POOL:
+          childCellType: cpu-machine-NODE
+          childCellNumber: 1
       physicalCells:
-      - cellType: CPU-NODE-POOL
+      - cellType: gpu-machine-NODE-POOL
         cellChildren:
-        - cellAddress: k8s01
-        - cellAddress: k8s02
+        - cellAddress: 192.168.19.116
+      - cellType: cpu-machine-NODE-POOL
+        cellChildren:
+        - cellAddress: 192.168.21.236
     virtualClusters:
-      default:
-        virtualCells:
-        - cellType: CPU-NODE-POOL.CPU-NODE
-          cellNumber: 2
+        default:
+          virtualCells:
+          - cellType: gpu-machine-NODE-POOL.gpu-machine-NODE
+            cellNumber: 1
+        cpuvc:
+          virtualCells:
+          - cellType: cpu-machine-NODE-POOL.cpu-machine-NODE
+            cellNumber: 1
 
 # uncomment following section, if you want to customize the authentication solution.
 authentication:
@@ -123,14 +105,14 @@ authentication:
   #  wellKnownURL: https://login.microsoftonline.com/{tenantID}/v2.0/.well-known/openid-configuration
   #
   #  # Required
-  #  tenantID: 
+  #  tenantID: ${tenat_id}
   #
   #  # Required, the client ID of your app in AAD
-  #  clientID: 
+  #  clientID: ${your_client_id}
   #
-  #  # Required if responseType is 'code', 'id_token code' or 'code id_token'.
-  #  # If app key contains '\', replace it with '\'.
-  #  clientSecret: ''
+  #  # Required if `responseType` is 'code', 'id_token code' or 'code id_token'.
+  #  # If app key contains '\', replace it with '\\'.
+  #  clientSecret: '${your_client_secret}'
   #
   #  # Optional. The lifetime of nonce in session or cookie, the default value is 3600 (seconds).
   #  nonceLifetime: null
@@ -188,28 +170,62 @@ authentication:
 
 
 # uncomment following section if you want to customize the port of pylon
-pylon:
-  port: 80
-  dataset-url: http://192.168.21.228:9000
-  registry-url: http://192.168.21.228:8080
-  application-auth-url: https://192.168.19.118
-  application-web-url: https://192.168.19.118:8443
-  model-auth-url: http://192.168.19.39:9080
-  model-web-url: http://192.168.19.39
-  label-server-url: http://192.168.21.228:8081
-  develop-server-url: http://192.168.21.102:8081
+# pylon:
+#  port: 80
 
-# if you want to enable alert manager to send alert email, uncomment following lines and fill
-# the right values.
+
+# if you want to enable alert-handler actions, uncomment following lines and fill the right values.
 # alert-manager:
-#   receiver: your_addr@example.com
-#   smtp_url: smtp.office365.com:587
-#   smtp_from: alert_sender@example.com
-#   smtp_auth_username: alert_sender@example.com
-#   smtp_auth_password: password_for_alert_sender
-#   port: 9093 # this is optional, you should not write this if you do not want to change the port alert-manager is listening on
+#   port: 9093 # optional, do not modify this if you do not want to change the port alert-manager is listening on
+#   alert-handler: # alert-handler will only be enabled when this field is not empty
+#     port: 9095 # optional, do not modify this if you do not want to change the port alert-handler is listening on
+#     log-level: "info" # optional
+#     pai-bearer-token: 'your-application-token-for-pai-rest-server'
+#     email-configs: # email-notification will only be enabled when this field is not empty
+#       admin-receiver: addr-of-admin-receiver@example.com
+#       smtp-host: smtp.office365.com
+#       smtp-port: 587
+#       smtp-from: alert-sender@example.com
+#       smtp-auth-username: alert-sender@example.com
+#       smtp-auth-password: password-for-alert-sender
+#   customized-routes:
+#     routes:
+#     - receiver: pai-email-admin-user-and-stop-job
+#       match:
+#         alertname: PAIJobGpuPercentLowerThan0_3For1h
+#   customized-receivers: # receivers are combination of several actions
+#   - name: "pai-email-admin-user-and-stop-job"
+#     actions: 
+#       # the email template for `email-admin` and `email-user `can be chosen from ['general-template', 'kill-low-efficiency-job-alert']
+#       # if no template specified, 'general-template' will be used.
+#       email-admin:
+#       email-user:  
+#         template: 'kill-low-efficiency-job-alert'
+#       stop-jobs: # no parameters required for stop-jobs action
+#       tag-jobs:
+#         tags: 
+#         - 'stopped-by-alert-manager'
 
-# uncomment following if you want to change customeize grafana
+# uncomment following if you want to customize prometheus
+# prometheus:
+#   port: 9091 # optional, do not modify this if you do not want to change the port prometheus is listening on
+#   # How frequently to scrape targets
+#   scrape_interval: 30
+#   customized-alerts: |
+#     groups:
+#     - name: customized-alerts
+#       rules:
+#       - alert: PAIJobGpuPercentLowerThan0_3For1h
+#         expr: avg(task_gpu_percent{virtual_cluster=~"default"}) by (job_name) < 0.3
+#         for: 1h
+#         labels:
+#           severity: warn
+#         annotations:
+#           summary: "{{$labels.job_name}} has a job gpu percent lower than 30% for 1 hour"
+#           description: Monitor job level gpu utilization in certain virtual clusters.
+
+
+# uncomment following if you want to change customize grafana
 # grafana:
 #   port: 3000
 
@@ -226,13 +242,6 @@ pylon:
 #   interface: eth0,eno2
 
 
-# uncomment following if you want to change customeize prometheus
-# prometheus:
-#   port: 9091
-#   # How frequently to scrape targets
-#   scrape_interval: 30
-
-
 # uncomment following section if you want to customize the threshold of cleaner
 # cleaner:
 #  threshold: 94
@@ -241,6 +250,10 @@ pylon:
 # uncomment following section if you want to customize the port of log-manager
 # log-manager:
 #  port: 9103
+#  admin_name: "admin"
+#  admin_password: "admin"
+#  jwt_secret: "jwt_secret"
+#  token_expired_second: 120
 
 
 # uncomment following section if you want to customize the port of storage-manager
