@@ -8,10 +8,10 @@ console.log(bb2);
 
 
 //const grouplist="[\"default\",\"admingroup\"]"
-const grouplist="{\"acls\":{\"admin\":true,\"virtualClusters\":[\"cpuVC\"],\"storageConfigs\":[\"jiagy-pvc\"]}}"
+const grouplist="{\"acls\":{\"admin\":true,\"virtualClusters\":[],\"storageConfigs\":[],\"groupAdmin\":[]}}"
 const cc=Buffer.from(grouplist).toString('base64')
 console.log(cc);
 
-const gl="[\"default\"]"
-const dd=Buffer.from(gl).toString('base64')
-console.log(dd);
+//const gl="[\"default\"]"
+//const dd=Buffer.from(gl).toString('base64')
+//console.log(dd);

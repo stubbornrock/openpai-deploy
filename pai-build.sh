@@ -25,7 +25,8 @@ cp pai-build.yaml ${TMP_DIR}/services-configuration.yaml
 sed -i "s/tag: .*/tag: ${TAG_BASE}-${tag}/g" ${TMP_DIR}/services-configuration.yaml
 
 #build
-rm -rf $COMPONENT_DIR}/${service}/.env
+#cat $COMPONENT_DIR/${service}/.env
+rm -rf $COMPONENT_DIR/${service}/.env
 
 pushd ${BUILD_DIR} > /dev/null
 ./pai_build.py build -c ${TMP_DIR} -s ${service}

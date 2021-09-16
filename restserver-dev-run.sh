@@ -30,6 +30,9 @@ cat ./restserver-dev-configs/aiaccount-configuration/account.yaml > ${BASE_PATH}
 mkdir -p ${BASE_PATH}/docker-build-configuration
 cat ./restserver-dev-configs/docker-build-configuration/docker-build.yaml > ${BASE_PATH}/docker-build-configuration/docker-build.yaml
 
+mkdir -p ${BASE_PATH}/develop-platform
+cat ./restserver-dev-configs/develop-platform/develop.yaml > ${BASE_PATH}/develop-platform/develop.yaml
+
 mkdir -p ~/.kube/
 cat ./restserver-dev-configs/.kube/config > ~/.kube/config
 

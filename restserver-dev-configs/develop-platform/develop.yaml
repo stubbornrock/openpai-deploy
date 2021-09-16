@@ -1,0 +1,8 @@
+aidesktop:
+  namespace: default
+  image: tkeregistry.teleaip.cn/library/mltooling/ml-workspace-gpu:ctbriv2
+  hosts: 192.168.19.116,192.168.21.236
+knime:
+  namespace: default
+  image: 192.168.24.21/openpai/knime-vnc-docker:v4.3.0
+  hosts: 192.168.19.116,192.168.21.236

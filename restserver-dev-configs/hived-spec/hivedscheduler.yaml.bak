@@ -14,20 +14,9 @@ physicalCluster:
       gpu: 0
       cpu: 4
       memory: 12Gi
-    ASCEND310:
-      gpu: 1
-      cpu: 4
-      memory: 24Gi
-    ASCEND910:
-      gpu: 1
-      cpu: 24
-      memory: 24Gi
   cellTypes:
-    p4000-1GPU:
-      childCellType: P4000
-      childCellNumber: 1
     p4000-NODE:
-      childCellType: p4000-1GPU
+      childCellType: P4000
       childCellNumber: 2
       isNodeLevel: true
     a100-NODE:
@@ -38,14 +27,6 @@ physicalCluster:
       childCellType: CPU4C12M
       childCellNumber: 10
       isNodeLevel: true
-    ascend310-NODE:
-      childCellType: ASCEND310
-      childCellNumber: 16
-      isNodeLevel: true
-    ascend910-NODE:
-      childCellType: ASCEND910
-      childCellNumber: 8
-      isNodeLevel: true
     p4000-NODE-POOL:
       childCellType: p4000-NODE
       childCellNumber: 1
@@ -54,12 +35,6 @@ physicalCluster:
       childCellNumber: 2
     cpu4c12m-NODE-POOL:
       childCellType: cpu4c12m-NODE
-      childCellNumber: 1
-    ascend310-NODE-POOL:
-      childCellType: ascend310-NODE
-      childCellNumber: 1
-    ascend910-NODE-POOL:
-      childCellType: ascend910-NODE
       childCellNumber: 1
   physicalCells:
   - cellType: p4000-NODE-POOL
@@ -72,32 +47,14 @@ physicalCluster:
   - cellType: cpu4c12m-NODE-POOL
     cellChildren:
     - cellAddress: 192.168.26.32
-  - cellType: ascend310-NODE-POOL
-    cellChildren:
-    - cellAddress: 192.168.24.202
-  - cellType: ascend910-NODE-POOL
-    cellChildren:
-    - cellAddress: 192.168.24.201
 virtualClusters:
     default:
       virtualCells:
       - cellType: p4000-NODE-POOL.p4000-NODE
         cellNumber: 0
-    ascend310:
+    p4000:
       virtualCells:
-      - cellType: ascend310-NODE-POOL.ascend310-NODE
-        cellNumber: 1
-    ascend910:
-      virtualCells:
-      - cellType: ascend910-NODE-POOL.ascend910-NODE
-        cellNumber: 1
-    p4000id01:
-      virtualCells:
-      - cellType: p4000-NODE-POOL.p4000-NODE.p4000-1GPU
-        cellNumber: 1
-    p4000id02:
-      virtualCells:
-      - cellType: p4000-NODE-POOL.p4000-NODE.p4000-1GPU
+      - cellType: p4000-NODE-POOL.p4000-NODE
         cellNumber: 1
     a100id01:
       virtualCells:

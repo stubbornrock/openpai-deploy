@@ -20,10 +20,14 @@ cat << __EOT__ > .env
 #JOB_HISTORY=true
 #AUTHN_METHOD=basic
 #PROM_SCRAPE_TIME=300s
-WEBPORTAL_PLUGINS=[{"uri": "http://192.168.19.33:32767/submit-job-v2/plugin.js", "id": "submit-job-v2", "title": "作业提交V2"}, {"uri": "http://192.168.19.33:32767/marketplace/plugin.js", "id": "marketplace", "title": "模板仓库"}]
+#WEBPORTAL_PLUGINS=[{"uri": "http://192.168.19.33:32767/submit-job-v2/plugin.js", "id": "submit-job-v2", "title": "作业提交V2"}, {"uri": "http://192.168.19.33:32767/marketplace/plugin.js", "id": "marketplace", "title": "模板仓库"}]
 ##WEBPORTAL_PLUGINS=[{"uri": "http://192.168.21.221:9290/plugin.js", "id": "submit-job-v2", "title": "作业提交V2"}, {"uri": "http://192.168.21.221:9291/plugin.js", "id": "marketplace", "title": "模板仓库"}]
 ##WEBPORTAL_PLUGINS=[{"uri": "http://192.168.19.33:32767/submit-job-v2/plugin.js", "id": "submit-job-v2", "title": "作业提交V2"}, {"uri": "http://192.168.21.221:9291/plugin.js", "id": "marketplace", "title": "模板仓库"}]
 
+#STORAGE_APP_TYPE=[{ "key": "dataset", "text": "数据集" },{ "key": "mlearn", "text": "机器学习编排" }]
+WEBPORTAL_PLUGINS=[{"uri": "http://192.168.21.236:9293/plugin.js?repo=Microsoft%2Fpai", "id": "marketplace", "title": "训练模板仓库"}]
+STORAGE_APP_TYPE=[]
+JOB_IMAGE_OPTIONS=[]
 LAUNCHER_TYPE=k8s
 LAUNCHER_SCHEDULER=hivedscheduler
 REST_SERVER_URI=http://192.168.21.221:9186
@@ -38,7 +42,8 @@ AUTHN_METHOD=basic
 JOB_HISTORY="true"
 PROM_SCRAPE_TIME=300s
 ENABLE_JOB_TRANSFER="false"
-IMAGE_URI_NAME=harbor.teleaip.cn
+IMAGE_URI_NAME=https://192.168.24.21
+TERMINAL_URI=http://192.168.21.236:32066
 __EOT__
 npm run dev
 popd > /dev/null
